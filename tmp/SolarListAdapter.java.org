@@ -1,0 +1,157 @@
+package com.entscheidungsbaum.android.solarMonitor;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+/**
+ * @author mschlech
+ * 
+ *         SolarListAdapter
+ */
+
+public class SolarListAdapter extends BaseAdapter {
+
+	private Bitmap tempSensor_icon;
+	private Bitmap relais_icon;
+	private Bitmap volumeStream_icon;
+	private Bitmap rpm_icon;
+
+	private Context mContext;
+	List<SensorBean> mItems = new ArrayList<SensorBean>();
+	SolarDataSource sds = new SolarDataSource();
+
+	String[] DATA = {sds.getData().entrySet().toString()};;
+
+	public SolarListAdapter(Context aContext, ArrayList<SensorBean> items) {
+
+		mInflater = LayoutInflater.from(aContext);
+
+		tempSensor_icon = BitmapFactory.decodeResource(aContext.getResources(), R.drawable.tmpsensor_icon);
+		relais_icon = BitmapFactory.decodeResource(aContext.getResources(), R.drawable.relais_icon);
+		volumeStream_icon = BitmapFactory.decodeResource(aContext.getResources(), R.drawable.volumestream_icon);
+		rpm_icon = BitmapFactory.decodeResource(aContext.getResources(), R.drawable.rpm_icon);
+
+		mContext = aContext;
+		mItems = items;
+
+	}
+
+	/**
+	 * list icon
+	 */
+	private LayoutInflater mInflater;
+
+	public SolarListAdapter(Context context) {
+		mInflater = LayoutInflater.from(context);
+
+		tempSensor_icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.tmpsensor_icon);
+		relais_icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.relais_icon);
+		volumeStream_icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.volumestream_icon);
+		rpm_icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.rpm_icon);
+	}
+
+	@Override
+	public int getCount() {
+		// SolarDataSource sds = new SolarDataSource();
+		// return sds.getData().size();
+		return DATA.length;
+		// return mItems.size();
+	}
+
+	@Override
+	public Object getItem(int position) {
+		// return mItems.get(position);
+		return position;
+	}
+
+	@Override
+	public long getItemId(int position) {
+
+		return position;
+
+	}
+
+	/**
+	 * @param convertView
+	 *            The old view to overwrite, if one is passed
+	 * @returns a ContactEntryView that holds wraps around an ContactEntry
+	 */
+	// public View getView(int position, View convertView, ViewGroup parent) {
+	// SolarEntryView sev;
+	// if (convertView == null) {
+	// sev = new SolarEntryView(mContext, mItems.get(position));
+	// } else {
+	// sev = (SolarEntryView) convertView;
+	// String sensor1 = String.valueOf(mItems.get(position).getTempSensor1());
+	// sev.setmSensor1(sensor1);
+	// String sensorName = "TMpSenso1";
+	// if (sensorName != null) {
+	// sev.setmSensor1("Mobile: " +
+	// String.valueOf(mItems.get(position).getTempSensor1()));
+	// }
+	// }
+	// return sev;
+	// }
+
+	@Override
+	public View getView(int position, View convertView, ViewGroup parent) {
+
+		// String[] DATA = {"12","34","45","65"};
+		// SolarEntryView sev;
+		ViewHolder holder;
+
+		if (convertView == null) {
+
+			// sev = new SolarEntryView(mContext, mItems.get(position));
+
+			convertView = mInflater.inflate(R.layout.list_item_icon_text, null);
+
+			holder = new ViewHolder();
+			holder.text = (TextView) convertView.findViewById(R.id.text);
+			holder.icon = (ImageView) convertView.findViewById(R.id.icon);
+
+			convertView.setTag(holder);
+		} else {
+
+			holder = (ViewHolder) convertView.getTag();
+		}
+
+		// holder.text.setText("Value : " +
+		// String.valueOf(mItems.get(position).getTempSensor1()));
+		// holder.text.setText("Value : " +
+		// String.valueOf(mItems.get(position).toString()));
+
+		// holder.icon.setImageBitmap(this.tempSensor_icon);
+
+		holder.text.setText("Value : " + DATA[position]);
+		// for (Map.Entry<String, Number> idxSds : sds.getData().entrySet()) {
+		// Log.d("Value => " + idxSds.getValue(), " Value => " +
+		// idxSds.getValue());
+		// holder.text.setText("Value : " + idxSds.getValue());
+		//
+		// holder.icon.setImageBitmap(this.tempSensor_icon);
+		//
+		// }
+		// holder.text.setText("Value : " +
+		// sds.getData().entrySet().toString());
+		return convertView;
+	}
+
+	static class ViewHolder {
+		TextView text;
+		ImageView icon;
+	}
+
+}
