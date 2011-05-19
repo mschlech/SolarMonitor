@@ -29,8 +29,8 @@ public class SolarSerializerTest extends MapStoredEntity implements CsvDeseriali
 		return Integer.parseInt(get("id"));
 	}
 
-	public Date getDatum() {
-		return Date.valueOf("datum");
+	public String getDatum() {
+		return get("datum");
 		
 	}
 

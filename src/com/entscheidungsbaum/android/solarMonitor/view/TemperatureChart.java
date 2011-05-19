@@ -1,24 +1,49 @@
 package com.entscheidungsbaum.android.solarMonitor.view;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.sql.Date;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import net.droidsolutions.droidcharts.awt.Rectangle2D;
+import net.droidsolutions.droidcharts.core.ChartFactory;
 import net.droidsolutions.droidcharts.core.JFreeChart;
+import net.droidsolutions.droidcharts.core.axis.CategoryAxis;
+import net.droidsolutions.droidcharts.core.axis.CategoryLabelPositions;
+import net.droidsolutions.droidcharts.core.axis.NumberAxis;
+import net.droidsolutions.droidcharts.core.data.CategoryDataset;
+import net.droidsolutions.droidcharts.core.data.DefaultCategoryDataset;
 import net.droidsolutions.droidcharts.core.data.XYDataset;
+import net.droidsolutions.droidcharts.core.data.general.Dataset;
+import net.droidsolutions.droidcharts.core.data.xy.XYSeries;
+import net.droidsolutions.droidcharts.core.data.xy.XYSeriesCollection;
+import net.droidsolutions.droidcharts.core.plot.CategoryPlot;
+import net.droidsolutions.droidcharts.core.plot.PlotOrientation;
+import net.droidsolutions.droidcharts.core.plot.XYPlot;
+import net.droidsolutions.droidcharts.core.renderer.category.LineAndShapeRenderer;
+import net.droidsolutions.droidcharts.core.renderer.xy.XYLineAndShapeRenderer;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.os.Environment;
 import android.os.Handler;
+import android.os.Parcelable.Creator;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
 import com.entscheidungsbaum.android.solarMonitor.SensorBean;
+import com.entscheidungsbaum.android.solarMonitor.utilities.CsvDeserializer;
+import com.entscheidungsbaum.android.solarMonitor.utilities.SolarSerializerTest;
 
 /**
  * @author mschlech
@@ -28,23 +53,35 @@ import com.entscheidungsbaum.android.solarMonitor.SensorBean;
 
 public class TemperatureChart extends View {
 
+	String file = "/sdcard/TextData_20110329.log.csv";
+
 	private final Rect mRect = new Rect();
 
 	private final Handler mHandler;
 
 	public TemperatureChart(Context context) {
 		super(context);
+
 		mHandler = new Handler();
 		/**
 		 * for development purposes
 		 */
-		this.fillSensorBean();
+		this.doSerialize();
+	}
+
+	public TemperatureChart(Context context, AttributeSet attrs) {
+		super(context, attrs);
+		
+		mHandler = new Handler();
+		// register our interest in hearing about changes to our surface
+		this.doSerialize();
 	}
 
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
 		canvas.getClipBounds(mRect);
+
 		final XYDataset dataset = createDataset();
 		final JFreeChart chart = createChart(dataset);
 		chart.draw(canvas, new Rectangle2D.Double(0, 0, mRect.width(), mRect.height()));
@@ -53,87 +90,122 @@ public class TemperatureChart extends View {
 	}
 
 	/**
+	 * Schedule a user interface repaint.
+	 */
+	public void repaint() {
+		mHandler.post(new Runnable() {
+			public void run() {
+				invalidate();
+			}
+		});
+	}
+
+	/**
 	 * 
 	 * @return
 	 */
 	private XYDataset createDataset() {
 
-		return null;
+		final XYSeriesCollection dataset = new XYSeriesCollection();
+		XYSeries xySeries = new XYSeries("tempSensor");
+		List<SolarSerializerTest> sst = this.startSerialization();
+		double dTest = 1.0;
+		for (SolarSerializerTest sstl : sst) {
+			xySeries.add(Double.valueOf(dTest), Double.valueOf(sstl.get("temperaturSensor1")));
+			dTest += 1.0;
+		}
+
+		dataset.addSeries(xySeries);
+		return dataset;
 	}
 
 	/**
 	 * 
 	 * @param dataset
-	 * @return
+	 * @return JFreeChart object
 	 */
 	private JFreeChart createChart(final XYDataset dataset) {
 
-		return null;
+		// create the chart...
+		final JFreeChart chart = ChartFactory.createXYLineChart("Temperature1", // chart
+				// title
+				"Hour", // x axis label
+				"Temp", // y axis label
+				dataset, // data
+				PlotOrientation.VERTICAL, true, // include legend
+				true, // tooltips
+				false // urls
+				);
+
+		Paint white = new Paint(Paint.ANTI_ALIAS_FLAG);
+		white.setColor(Color.WHITE);
+
+		Paint dkGray = new Paint(Paint.ANTI_ALIAS_FLAG);
+		dkGray.setColor(Color.DKGRAY);
+
+		Paint lightGray = new Paint(Paint.ANTI_ALIAS_FLAG);
+		lightGray.setColor(Color.LTGRAY);
+		lightGray.setStrokeWidth(10);
+
+		chart.setBackgroundPaint(white);
+
+		final XYPlot plot = chart.getXYPlot();
+		plot.setBackgroundPaint(dkGray);
+		plot.setDomainGridlinePaint(lightGray);
+		plot.setRangeGridlinePaint(lightGray);
+
+		final XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
+		plot.setRenderer(renderer);
+
+		// change the auto tick unit selection to integer units only...
+		final NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+		rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
+
+		return chart;
 	}
 
 	/**
-	 * @TODO introduce some Parameters to fill in for a specific date
+	 * development purposes
 	 */
-	private void fillSensorBean() {
-		SensorBean sb = new SensorBean();
-		String file = "/Users/mschlech/workspace/SolarMonitor/tmp/TextData_20110329.log.csv";
+	private void doSerialize() {
+		List<SolarSerializerTest> sst = this.startSerialization();
+
+		for (SolarSerializerTest ssts : sst) {
+			Log.d("ssts ", " {" + ssts.get("temperaturSensor1") + " }");
+		}
+
+	}
+
+	/**
+	 * 
+	 * @return List of SerializerTest
+	 * 
+	 */
+
+	private List<SolarSerializerTest> startSerialization() {
+
+		char seperator = '\t';
+		CsvDeserializer cd = new CsvDeserializer(seperator);
+		List<SolarSerializerTest> ls = new ArrayList<SolarSerializerTest>();
+		BufferedReader br = null;
+		Map<String, String> m = null;
+
 		try {
+			br = new BufferedReader(new FileReader(file));
+			String line = "";
+			int i = 0;
+			while ((line = br.readLine()) != null) {
 
-			BufferedReader br = new BufferedReader(new FileReader(file));
-
-			String strLine = null;
-
-			StringTokenizer st = null;
-
-			int lineNumber = 0, tokenNumber = 0;
-
-			while ((file = br.readLine()) != null)
-
-			{
-
-				lineNumber++;
-
-				// break comma separated line using ","
-
-				st = new StringTokenizer(file, "\t");
-
-				while (st.hasMoreTokens())
-
-				{
-
-					// display csv values
-
-					tokenNumber++;
-
-					Log.d("Line  " + lineNumber +
-
-					", Token  " + tokenNumber
-
-					+ ", Token : " , st.nextToken());
-
-				}
-
-				// reset token number
-
-				tokenNumber = 0;
-
+				m = cd.deserialize(line, new SolarSerializerTest(null));
+				if (i++ > 0)
+					ls.add(new SolarSerializerTest(m));
 			}
-
+		} catch (FileNotFoundException ex) {
+			Log.e("FileNotFoundException", ex.getMessage());
+		} catch (IOException ex) {
+			Log.e("IOException", ex.getMessage());
 		}
-
-		catch (FileNotFoundException e) {
-
-			// TODO Auto-generated catch block
-
-			e.printStackTrace();
-
-		} catch (IOException e) {
-
-			// TODO Auto-generated catch block
-
-			e.printStackTrace();
-
-		}
+		return ls;
 
 	}
 

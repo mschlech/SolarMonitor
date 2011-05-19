@@ -17,6 +17,7 @@ import com.entscheidungsbaum.android.solarMonitor.SolarDataSource;
 import com.entscheidungsbaum.android.solarMonitor.SolarLauncher;
 import com.entscheidungsbaum.android.solarMonitor.SolarMainMenuDispatcherConstants;
 import com.entscheidungsbaum.android.solarMonitor.SolarMonitor;
+import com.entscheidungsbaum.android.solarMonitor.view.LineChartExampleView;
 import com.entscheidungsbaum.android.solarMonitor.view.TemperatureChart;
 
 /**
@@ -33,7 +34,7 @@ public class SolarSensorActivity extends Activity implements SolarLauncher {
 	private static final int[] innerIcon_mapping = { -1, R.drawable.temperature_icon, R.drawable.temperature_icon,
 			R.drawable.temperature_icon, R.drawable.temperature_icon, R.drawable.temperature_icon, R.drawable.back_icon };
 
-	private int index = icon_mapping.length + 1;
+	private int index = icon_mapping.length -1;
 
 	/**
 	 * the bundle string which holds the data . not used because data is fetched
@@ -70,7 +71,8 @@ public class SolarSensorActivity extends Activity implements SolarLauncher {
 			break;
 		case SolarMainMenuDispatcherConstants.DIAGRAMM_VIEW:
 			Log.d("Jump to ", "Diagramm sensor view");
-			Intent dsView = new Intent(this, TemperatureChart.class);
+			Intent dsView = new Intent(this, TemperatureChartActivity.class);
+			//Intent dsView = new Intent(this, LineChartExampleView.class);
 			startActivity(dsView);
 			break;
 
@@ -84,37 +86,27 @@ public class SolarSensorActivity extends Activity implements SolarLauncher {
 
 		setTheme(android.R.style.Theme_Wallpaper_NoTitleBar);
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.launcher);
-		/**
-		 * not used so commented
-		 */
-		// DATA = (String[]) getIntent().getExtras().get(SOLAR_ENGINE_DATA);
-		ArrayList<String> ARRAYDATA = new ArrayList<String>();
-		// if (DATA == null) {
-		// Log.e("NO DATA", "");
-		// stopService(getIntent());
-		// }
+		setContentView(R.layout.sensorlauncher);
 
 		int icon_mapping_length = sds.getData().entrySet().size();
 		Log.d("iconMapping of getData is  ", " =>" + icon_mapping_length);
-		int I = 0;
+		int I = 1;
 		String[] text_mapping = { DATA.toString() };
 		String ar[] = { sds.getData().entrySet().toString() };
 
 		for (Map.Entry<String, Number> idxSds : sds.getData().entrySet()) {
-			Log.d("I = "," "+ innerIcon_mapping[I] + " findViewById => " + findViewById(I));
+			Log.d("I = "," "+ icon_mapping[I] + " findViewById => " + findViewById(icon_mapping[I]));
 			
-			//SolarButton button = new SolarButton(findViewById(I), I);
-//			if (idxSds.getKey().contains("tempSensor")) {
-//				Log.d("ICONMAPPING ", " => " + icon_mapping[I] + "" + idxSds.getKey());
-//				I++;
-//				button.setIcon(R.drawable.temperature_icon);
-//				button.setText(idxSds.getKey() + "" + String.valueOf(idxSds.getValue()));
-//				button.setButtonListener(this);
-//		} else {
-				Log.d("another type of", " KEY " + idxSds.getKey());
-		//	}
+			SolarButton button = new SolarButton(findViewById(icon_mapping[I]), I);
+			if (idxSds.getKey().contains("tempSensor")) {
+				Log.d("ICONMAPPING ", " => " + icon_mapping[I] + "" + idxSds.getKey());
 				I++;
+				button.setIcon(R.drawable.temperature_icon);
+				button.setText(idxSds.getKey() + " " + String.valueOf(idxSds.getValue()));
+				button.setButtonListener(this);
+		} else {
+				Log.d("another type of", " KEY " + idxSds.getKey());
+			}
 		}
 
 	}

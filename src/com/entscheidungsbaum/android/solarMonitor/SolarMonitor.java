@@ -125,6 +125,7 @@ public class SolarMonitor extends Activity implements SolarLauncher {
 		for (int p = 1; p <= index; p++) {
 			Log.d("p ", String.valueOf(p));
 			Log.d("Button ", String.valueOf(icon_mapping[p]));
+			Log.d("I = "," "+ icon_mapping[p] + " findViewById => " + findViewById(p));
 			SolarButton button = new SolarButton(findViewById(icon_mapping[p]), p);
 			Log.d("SOLARBUTTON =>  ", String.valueOf(button.getPosition()));
 			Log.d("value text", text_mapping[p]);
