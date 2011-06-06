@@ -116,7 +116,7 @@ public class SolarMonitor extends Activity implements SolarLauncher {
 		 * for the first time
 		 */
 
-		setTheme(android.R.style.Theme_Wallpaper_NoTitleBar);
+		setTheme(android.R.style.Theme_NoTitleBar);
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.launcher);

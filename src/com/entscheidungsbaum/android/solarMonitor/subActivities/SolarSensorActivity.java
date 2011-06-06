@@ -82,7 +82,7 @@ public class SolarSensorActivity extends Activity implements SolarLauncher {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
-		setTheme(android.R.style.Theme_Wallpaper_NoTitleBar);
+		setTheme(android.R.style.Theme_NoTitleBar);
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.sensorlauncher);
 

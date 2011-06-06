@@ -34,7 +34,7 @@ public class SolarRelaisActivity extends Activity implements SolarLauncher{
 		Log.d("Activity", "SolarRelaisActivity");
 		setContentView(R.layout.launcher);
 
-		setTheme(android.R.style.Theme_Wallpaper_NoTitleBar);
+		setTheme(android.R.style.Theme_NoTitleBar);
 		super.onCreate(bundle);
 
 		setContentView(R.layout.launcher);
@@ -65,7 +65,7 @@ public class SolarRelaisActivity extends Activity implements SolarLauncher{
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		
-		setTheme(android.R.style.Theme_Wallpaper_NoTitleBar);
+		setTheme(android.R.style.Theme_NoTitleBar);
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.launcher);
