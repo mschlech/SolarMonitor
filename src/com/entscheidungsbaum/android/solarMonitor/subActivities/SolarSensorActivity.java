@@ -17,8 +17,6 @@ import com.entscheidungsbaum.android.solarMonitor.SolarDataSource;
 import com.entscheidungsbaum.android.solarMonitor.SolarLauncher;
 import com.entscheidungsbaum.android.solarMonitor.SolarMainMenuDispatcherConstants;
 import com.entscheidungsbaum.android.solarMonitor.SolarMonitor;
-import com.entscheidungsbaum.android.solarMonitor.view.LineChartExampleView;
-import com.entscheidungsbaum.android.solarMonitor.view.TemperatureChart;
 
 /**
  * @author mschlech

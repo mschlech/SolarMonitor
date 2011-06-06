@@ -1,13 +1,14 @@
 package com.entscheidungsbaum.android.solarMonitor.subActivities;
 
-import com.entscheidungsbaum.android.solarMonitor.R;
-import com.entscheidungsbaum.android.solarMonitor.SolarButton;
-import com.entscheidungsbaum.android.solarMonitor.SolarLauncher;
-
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+
+import com.entscheidungsbaum.android.solarMonitor.R;
+import com.entscheidungsbaum.android.solarMonitor.SolarButton;
+import com.entscheidungsbaum.android.solarMonitor.SolarLauncher;
+import com.entscheidungsbaum.android.solarMonitor.services.WeatherService;
 
 /**
  * @author mschlech
@@ -38,11 +39,15 @@ public class SolarRelaisActivity extends Activity implements SolarLauncher{
 
 		setContentView(R.layout.launcher);
 		
+		int key = launcherButton.getPosition();
+		
+		
+		
 		// Generate launcher icons
 		for (int p = 1; p <= index; p++) {
 			Log.d("Button ", String.valueOf(icon_mapping[p]));
 			SolarButton button = new SolarButton(findViewById(icon_mapping[p]), p);
-			Log.d("SOLARBUTTON =>  ", String.valueOf(button.getPosition()));
+			Log.d("WEATHER =>  ", String.valueOf(button.getPosition()));
 			Log.d("value text", text_mapping[p]);
 
 			button.setIcon(icon_mapping[p]);
@@ -55,6 +60,20 @@ public class SolarRelaisActivity extends Activity implements SolarLauncher{
 		}
 	}
 
+	
+	
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		
+		setTheme(android.R.style.Theme_Wallpaper_NoTitleBar);
+		super.onCreate(savedInstanceState);
+
+		setContentView(R.layout.launcher);
+		WeatherService ws = new WeatherService();
+		ws.getActualWeatherSimple();
+	}
+	
+	
 	@Override
 	public boolean onLongClick(SolarButton launcherButton, Bundle bundle) {
 		// TODO Auto-generated method stub

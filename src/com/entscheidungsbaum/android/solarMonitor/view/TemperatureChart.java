@@ -43,7 +43,7 @@ import android.view.View;
 
 import com.entscheidungsbaum.android.solarMonitor.SensorBean;
 import com.entscheidungsbaum.android.solarMonitor.utilities.CsvDeserializer;
-import com.entscheidungsbaum.android.solarMonitor.utilities.SolarSerializerTest;
+import com.entscheidungsbaum.android.solarMonitor.utilities.SensorMapper;
 
 /**
  * @author mschlech
@@ -108,9 +108,9 @@ public class TemperatureChart extends View {
 
 		final XYSeriesCollection dataset = new XYSeriesCollection();
 		XYSeries xySeries = new XYSeries("tempSensor");
-		List<SolarSerializerTest> sst = this.startSerialization();
+		List<SensorMapper> sst = this.startSerialization();
 		double dTest = 1.0;
-		for (SolarSerializerTest sstl : sst) {
+		for (SensorMapper sstl : sst) {
 			xySeries.add(Double.valueOf(dTest), Double.valueOf(sstl.get("temperaturSensor1")));
 			dTest += 1.0;
 		}
@@ -168,9 +168,9 @@ public class TemperatureChart extends View {
 	 * development purposes
 	 */
 	private void doSerialize() {
-		List<SolarSerializerTest> sst = this.startSerialization();
+		List<SensorMapper> sst = this.startSerialization();
 
-		for (SolarSerializerTest ssts : sst) {
+		for (SensorMapper ssts : sst) {
 			Log.d("ssts ", " {" + ssts.get("temperaturSensor1") + " }");
 		}
 
@@ -182,11 +182,11 @@ public class TemperatureChart extends View {
 	 * 
 	 */
 
-	private List<SolarSerializerTest> startSerialization() {
+	private List<SensorMapper> startSerialization() {
 
 		char seperator = '\t';
 		CsvDeserializer cd = new CsvDeserializer(seperator);
-		List<SolarSerializerTest> ls = new ArrayList<SolarSerializerTest>();
+		List<SensorMapper> ls = new ArrayList<SensorMapper>();
 		BufferedReader br = null;
 		Map<String, String> m = null;
 
@@ -196,9 +196,9 @@ public class TemperatureChart extends View {
 			int i = 0;
 			while ((line = br.readLine()) != null) {
 
-				m = cd.deserialize(line, new SolarSerializerTest(null));
+				m = cd.deserialize(line, new SensorMapper(null));
 				if (i++ > 0)
-					ls.add(new SolarSerializerTest(m));
+					ls.add(new SensorMapper(m));
 			}
 		} catch (FileNotFoundException ex) {
 			Log.e("FileNotFoundException", ex.getMessage());
